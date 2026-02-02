@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Will You Be Mine?</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#ff758c,#ff7eb3);
+}
+
+.container{
+    text-align:center;
+    background:rgba(255,255,255,0.95);
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    z-index:2;
+}
+
+h1{color:#e60073;margin-bottom:20px;}
+.timer{font-size:18px;color:#444;margin-bottom:20px;}
+
+button{
+    padding:15px 35px;
+    font-size:18px;
+    border:none;
+    border-radius:30px;
+    cursor:pointer;
+    margin:10px;
+}
+
+#yesBtn{background:#ff3366;color:white;}
+#noBtn{background:#999;color:white;position:absolute;}
+
+.heart{
+    position:absolute;
+    animation:floatUp 6s linear infinite;
+    opacity:.8;
+}
+@keyframes floatUp{
+    0%{transform:translateY(100vh) scale(1)}
+    100%{transform:translateY(-10vh) scale(1.5);opacity:0}
+}
+
+.confetti{
+    position:absolute;
+    width:10px;
+    height:10px;
+    animation:fall 3s linear forwards;
+}
+@keyframes fall{
+    to{transform:translateY(100vh) rotate(360deg);opacity:0}
+}
+
+.pop{animation:pop 1.2s ease-out forwards;}
+@keyframes pop{
+    0%{transform:scale(.5);opacity:0}
+    60%{transform:scale(1.2);opacity:1}
+    100%{transform:scale(1)}
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🎶 Background music (LOCAL FILE) -->
+<audio id="bgMusic" loop>
+  <source src="Music.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 💋 Kiss sound (optional local or online) -->
+<audio id="kissSound">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-romantic-kiss-509.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container">
+    <h1>Aruna 💖<br>Will you be my Valentine?</h1>
+    <div class="timer" id="timer"></div>
+    <button id="yesBtn">Yes 😍</button>
+    <button id="noBtn">No 😜</button>
+    <p style="font-size:14px;color:#666;">Tap anywhere to start music 🎵</p>
+</div>
+
+<!-- Result screen -->
+<div id="result" style="display:none;"></div>
+
+<script>
+const bgMusic = document.getElementById("bgMusic");
+let musicStarted = false;
+
+/* ▶️ Start music on first interaction */
+function startMusic(){
+    if(!musicStarted){
+        bgMusic.volume = 0.7;
+        bgMusic.play().catch(()=>{});
+        musicStarted = true;
+    }
+}
+document.addEventListener("click", startMusic);
+document.addEventListener("touchstart", startMusic);
+
+/* 😜 No button escape */
+const noBtn=document.getElementById("noBtn");
+noBtn.addEventListener("mouseover",()=>{
+    noBtn.style.left=Math.random()*(window.innerWidth-noBtn.offsetWidth)+"px";
+    noBtn.style.top=Math.random()*(window.innerHeight-noBtn.offsetHeight)+"px";
+});
+
+/* ❤️ Floating hearts */
+function heart(){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerHTML="❤️";
+    h.style.left=Math.random()*window.innerWidth+"px";
+    h.style.fontSize=(20+Math.random()*20)+"px";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),6000);
+}
+setInterval(heart,300);
+
+/* 🎉 Confetti */
+function confetti(){
+    for(let i=0;i<80;i++){
+        const c=document.createElement("div");
+        c.className="confetti";
+        c.style.left=Math.random()*window.innerWidth+"px";
+        c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+        c.style.top="-10px";
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),3000);
+    }
+}
+
+/* 💘 YES click */
+document.getElementById("yesBtn").onclick = () => {
+    bgMusic.play(); // keep music looping
+    document.getElementById("kissSound").play();
+    confetti();
+
+    document.querySelector(".container").style.display = "none";
+
+    const result = document.getElementById("result");
+    result.style.display = "flex";
+    result.style.height = "100vh";
+    result.style.width = "100vw";
+    result.style.justifyContent = "center";
+    result.style.alignItems = "center";
+    result.style.flexDirection = "column";
+    result.style.background =
+      "url('https://images.unsplash.com/photo-1518199266791-5375a83190b7') center/cover";
+
+    result.innerHTML = `
+        <h1 class="pop" style="color:white;background:rgba(0,0,0,.6);
+        padding:25px 45px;border-radius:20px;">
+        I knew you’d say YES 😘💖
+        </h1>
+
+        <p class="pop" style="color:white;font-size:20px;margin-top:15px;">
+        — Yours forever,<br><b>Neelesh 💌</b>
+        </p>
+    `;
+};
+
+/* ⏳ Countdown */
+function updateTimer(){
+    const now=new Date();
+    let year=now.getFullYear();
+    const vDay=new Date(`February 14, ${year} 00:00:00`);
+    if(now>vDay) vDay.setFullYear(year+1);
+
+    const diff=vDay-now;
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor(diff%86400000/3600000);
+    const m=Math.floor(diff%3600000/60000);
+    const s=Math.floor(diff%60000/1000);
+
+    document.getElementById("timer").innerText =
+      `⏳ Valentine’s Day in ${d}d ${h}h ${m}m ${s}s`;
+}
+setInterval(updateTimer,1000);
+updateTimer();
+</script>
+
+</body>
+</html>
